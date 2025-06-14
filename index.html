@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chuyển UTF-8 thành Unicode Escape</title>
+  <title>Chuyển UTF-8 thành ANSI</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -30,24 +30,39 @@
       border-radius: 8px;
       overflow-x: auto;
     }
+    button {
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Chuyển UTF-8 thành Unicode Escape</h2>
-    <p>Tải lên file .txt UTF-8, kết quả sẽ hiện bên dưới:</p>
+    <h2>Chuyển UTF-8 thành ANSI</h2>
+    <p>Tải lên file .txt UTF-8, kết quả sẽ hiện bên dưới và bạn có thể tải về dạng ANSI (Windows-1252).</p>
     <input type="file" id="fileInput" accept=".txt" />
     <h3>Kết quả:</h3>
     <pre id="output">Đang chờ tệp...</pre>
+    <button id="downloadBtn" disabled>Tải về dạng ANSI</button>
 
     <p style="text-align: center; font-style: italic; margin-top: 40px;">
-  Powered by <a href="https://www.facebook.com/dcv.16" target="_blank" style="text-decoration: none; color: inherit;">@daocongvann</a>
-</p>
-
-
+      Powered by <a href="https://www.facebook.com/dcv.16" target="_blank" style="text-decoration: none; color: inherit;">@daocongvann</a>
+    </p>
   </div>
 
   <script>
+    let ansiContent = '';
+
+    function utf8ToAnsi(text) {
+      // Chuyển ký tự không thuộc ANSI sang dấu hỏi '?'
+      return [...text].map(char => {
+        const code = char.charCodeAt(0);
+        return code <= 255 ? char : '?';
+      }).join('');
+    }
+
     document.getElementById('fileInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -55,13 +70,19 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const text = e.target.result;
-        const escaped = [...text].map(char => {
-          const code = char.charCodeAt(0);
-          return code < 128 ? char : '\\u' + code.toString(16).padStart(4, '0');
-        }).join('');
-        document.getElementById('output').textContent = escaped;
+        ansiContent = utf8ToAnsi(text);
+        document.getElementById('output').textContent = ansiContent;
+        document.getElementById('downloadBtn').disabled = false;
       };
       reader.readAsText(file, 'utf-8');
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+      const blob = new Blob([ansiContent], { type: 'text/plain;charset=windows-1252' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'output_ansi.txt';
+      link.click();
     });
   </script>
 </body>
