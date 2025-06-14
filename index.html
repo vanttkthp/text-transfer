@@ -1,68 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome!</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuyển UTF-8 thành Unicode Escape</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      padding: 40px;
       text-align: center;
-      color: #333;
     }
-
-    .welcome-container {
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 3rem 2rem;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      max-width: 600px;
-      width: 90%;
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
+    input[type="file"] {
+      margin: 20px 0;
     }
-
-    p {
-      font-size: 1.2rem;
-      margin-top: 0;
-      font-weight: 300;
-    }
-
-    .button {
-      display: inline-block;
-      margin-top: 2rem;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      color: white;
-      background: #6a11cb;
-      background: linear-gradient(to right, #2575fc, #6a11cb);
-      border: none;
-      border-radius: 30px;
-      text-decoration: none;
-      transition: background 0.3s ease;
-    }
-
-    .button:hover {
-      background: linear-gradient(to right, #6a11cb, #2575fc);
+    pre {
+      background: #f0f0f0;
+      padding: 15px;
+      white-space: pre-wrap;
+      text-align: left;
+      border-radius: 8px;
+      overflow-x: auto;
     }
   </style>
 </head>
 <body>
-  <div class="welcome-container">
-    <h1>Welcome, Everyone!</h1>
-    <p>We’re thrilled to have you here. Let’s make something amazing together.</p>
-    <a href="#" class="button">Get Started</a>
+  <div class="container">
+    <h2>🔤 Chuyển UTF-8 thành Unicode Escape</h2>
+    <p>Tải lên file .txt UTF-8, kết quả sẽ hiện bên dưới:</p>
+    <input type="file" id="fileInput" accept=".txt" />
+    <h3>Kết quả:</h3>
+    <pre id="output">Đang chờ tệp...</pre>
   </div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const escaped = [...text].map(char => {
+          const code = char.charCodeAt(0);
+          return code < 128 ? char : '\\u' + code.toString(16).padStart(4, '0');
+        }).join('');
+        document.getElementById('output').textContent = escaped;
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+  </script>
 </body>
 </html>
